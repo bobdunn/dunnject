@@ -5,13 +5,16 @@ namespace Dunnject
 {
     public class Container
     {
+        List<Type> types = new List<Type>();
+
         public IEnumerable<Type> GetRegisteredTypes()
         {
-            return new List<Type>();
+            return types;
         }
 
         public void RegisterType<T>()
         {
+            types.Add(typeof(T));
         }
     }
 }
