@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections;
+using Xunit;
 
 namespace Dunnject.Tests
 {
@@ -13,6 +10,13 @@ namespace Dunnject.Tests
         public When_container_is_initialized()
         {
             container = new Container();
+        }
+
+        [Fact]
+        public void it_can_enumerate_registered_types()
+        {
+            var types = container.GetRegisteredTypes();
+            Assert.IsType<IEnumerable>(types);
         }
     }
 }
