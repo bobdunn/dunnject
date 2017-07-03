@@ -16,7 +16,7 @@ namespace Dunnject.Tests
         public void it_can_enumerate_registered_types()
         {
             var types = container.GetRegisteredTypes();
-            Assert.IsType<IEnumerable>(types);
+            Assert.IsAssignableFrom<IEnumerable>(types);
         }
     }
 }
