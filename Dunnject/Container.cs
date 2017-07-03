@@ -5,7 +5,7 @@ namespace Dunnject
 {
     public class Container
     {
-        public System.Collections.IEnumerable GetRegisteredTypes()
+        public IEnumerable<Type> GetRegisteredTypes()
         {
             return new List<Type>();
         }

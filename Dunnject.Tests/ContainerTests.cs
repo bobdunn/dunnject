@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Dunnject.Tests
@@ -16,13 +18,15 @@ namespace Dunnject.Tests
         public void it_can_enumerate_registered_types()
         {
             var types = container.GetRegisteredTypes();
-            Assert.IsAssignableFrom<IEnumerable>(types);
+            Assert.IsAssignableFrom<System.Collections.IEnumerable>(types);
         }
 
         [Fact]
         public void it_can_register_a_simple_type()
         {
             container.RegisterType<SampleClass>();
+            var types = container.GetRegisteredTypes();
+            Assert.Equal(typeof(SampleClass), types.First());
         }
     }
 
