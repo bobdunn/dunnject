@@ -41,8 +41,19 @@ namespace Dunnject.Tests
         {
             Assert.Throws<TypeLoadException>(() => container.Resolve<NotRegistered>());
         }
+
+        [Fact]
+        public void it_returns_same_instance_for_singleton()
+        {
+            container.RegisterType<UseAsSingleton>(LifecycleType.Singleton);
+            var firstInstance = container.Resolve<UseAsSingleton>();
+            var secondInstance = container.Resolve<UseAsSingleton>();
+            Assert.Same(firstInstance, secondInstance);
+        }
     }
 
     public class SampleClass { }
     public class NotRegistered { }
+    public class UseAsSingleton { }
+
 }
