@@ -14,13 +14,18 @@ namespace Dunnject
 
         public void RegisterType<T>(LifecycleType lifecycleType = LifecycleType.Transient)
         {
+            RegisterType<T, T>(lifecycleType);
+        }
+
+        public void RegisterType<TAbstract, TConcrete>(LifecycleType lifecycleType = LifecycleType.Transient)
+        {
             switch (lifecycleType)
             {
                 case LifecycleType.Transient:
-                    types.Add(typeof(T), null);
+                    types.Add(typeof(TAbstract), typeof(TConcrete));
                     break;
                 case LifecycleType.Singleton:
-                    types.Add(typeof(T), GetInstance<T>());
+                    types.Add(typeof(TAbstract), Activator.CreateInstance<TConcrete>());
                     break;
             }
         }
@@ -31,7 +36,7 @@ namespace Dunnject
             {
                 throw new TypeLoadException();
             }
-            if (types[typeof(T)] != null)
+            if (types[typeof(T)] != null && !(types[typeof(T)] is Type))
             {
                 return (T)types[typeof(T)];
             }
@@ -39,7 +44,8 @@ namespace Dunnject
         }
 
         private T GetInstance<T>(){
-            return Activator.CreateInstance<T>();
+            return (T)Activator.CreateInstance((Type)types[typeof(T)]);
         }
+
     }
 }
