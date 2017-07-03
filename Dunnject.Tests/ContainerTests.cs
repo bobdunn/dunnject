@@ -58,8 +58,18 @@ namespace Dunnject.Tests
             var secondInstance = container.Resolve<UseAsSingleton>();
             Assert.Same(firstInstance, secondInstance);
         }
+
+        [Fact]
+        public void it_can_register_simple_interface()
+        {
+            container.RegisterType<ISimple, Simple>();
+            var types = container.GetRegisteredTypes();
+            Assert.Contains(typeof(ISimple), types);
+        }
     }
 
+    public interface ISimple { }
+    public class Simple : ISimple { }
     public class SampleClass { }
     public class NotRegistered { }
     public class UseAsSingleton { }
