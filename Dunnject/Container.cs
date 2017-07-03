@@ -16,5 +16,10 @@ namespace Dunnject
         {
             types.Add(typeof(T));
         }
+
+        public T Resolve<T>()
+        {
+            return Activator.CreateInstance<T>();
+        }
     }
 }

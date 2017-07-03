@@ -32,7 +32,7 @@ namespace Dunnject.Tests
         [Fact]
         public void it_can_get_a_simple_type()
         {
-            var sampleClass = container.Resolve<SimpleClass>();
+            var sampleClass = container.Resolve<SampleClass>();
             Assert.IsType<SampleClass>(sampleClass);
         }
     }
