@@ -19,6 +19,10 @@ namespace Dunnject
 
         public T Resolve<T>()
         {
+            if(!types.Contains(typeof(T)))
+            {
+                throw new TypeLoadException();
+            }
             return Activator.CreateInstance<T>();
         }
     }
