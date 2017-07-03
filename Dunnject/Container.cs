@@ -9,5 +9,9 @@ namespace Dunnject
         {
             return new List<Type>();
         }
+
+        public void RegisterType<T>()
+        {
+        }
     }
 }
