@@ -12,6 +12,7 @@ namespace Dunnject.Tests
         public When_container_is_initialized()
         {
             container = new Container();
+            container.RegisterType<SampleClass>();
         }
 
         [Fact]
@@ -24,7 +25,6 @@ namespace Dunnject.Tests
         [Fact]
         public void it_can_register_a_simple_type()
         {
-            container.RegisterType<SampleClass>();
             var types = container.GetRegisteredTypes();
             Assert.Equal(typeof(SampleClass), types.First());
         }
@@ -35,7 +35,14 @@ namespace Dunnject.Tests
             var sampleClass = container.Resolve<SampleClass>();
             Assert.IsType<SampleClass>(sampleClass);
         }
+
+        [Fact]
+        public void it_throws_TypeLoadException_trying_to_resolve_unregistered_class()
+        {
+            Assert.Throws<TypeLoadException>(() => container.Resolve<NotRegistered>());
+        }
     }
 
     public class SampleClass { }
+    public class NotRegistered { }
 }
