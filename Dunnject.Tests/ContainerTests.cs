@@ -43,6 +43,14 @@ namespace Dunnject.Tests
         }
 
         [Fact]
+        public void it_returns_different_instance_for_transient_lifecycle()
+        {
+            var firstInstance = container.Resolve<SampleClass>();
+            var secondInstance = container.Resolve<SampleClass>();
+            Assert.NotSame(firstInstance, secondInstance);
+        }
+
+        [Fact]
         public void it_returns_same_instance_for_singleton()
         {
             container.RegisterType<UseAsSingleton>(LifecycleType.Singleton);
