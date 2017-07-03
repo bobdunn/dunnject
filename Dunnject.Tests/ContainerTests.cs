@@ -18,5 +18,13 @@ namespace Dunnject.Tests
             var types = container.GetRegisteredTypes();
             Assert.IsAssignableFrom<IEnumerable>(types);
         }
+
+        [Fact]
+        public void it_can_register_a_simple_type()
+        {
+            container.RegisterType<SampleClass>();
+        }
     }
+
+    public class SampleClass { }
 }
