@@ -28,6 +28,13 @@ namespace Dunnject.Tests
             var types = container.GetRegisteredTypes();
             Assert.Equal(typeof(SampleClass), types.First());
         }
+
+        [Fact]
+        public void it_can_get_a_simple_type()
+        {
+            var sampleClass = container.Resolve<SimpleClass>();
+            Assert.IsType<SampleClass>(sampleClass);
+        }
     }
 
     public class SampleClass { }
