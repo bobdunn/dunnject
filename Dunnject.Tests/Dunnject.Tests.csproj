@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="ContainerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeContainerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
