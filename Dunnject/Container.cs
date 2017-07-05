@@ -48,14 +48,18 @@ namespace Dunnject
             return GetInstance(type);
         }
 
+        private HashSet<Type> resolvingTypes = new HashSet<Type>();
         private object GetInstance(Type type)
         {
             var typeContainer = types[type];
             var args = typeContainer.GetDependencies().Select(d =>
             {
-                if (types.ContainsKey(d))
+                if (types.ContainsKey(d) && !resolvingTypes.Contains(d))
                 {
-                    return Resolve(d);
+                    resolvingTypes.Add(d);
+                    var dependentType = Resolve(d);
+                    resolvingTypes.Remove(d);
+                    return dependentType;
                 }
                 else { throw new TypeLoadException(); }
             }).ToArray();
