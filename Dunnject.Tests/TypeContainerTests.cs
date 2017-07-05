@@ -20,12 +20,5 @@ namespace Dunnject.Tests
         }
     }
 
-    public class DependentClass
-    {
-        public DependentClass(IDependency dependency)
-        {
 
-        }
-    }
-    public interface IDependency { }
 }

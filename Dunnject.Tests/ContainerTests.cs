@@ -62,16 +62,9 @@ namespace Dunnject.Tests
         [Fact]
         public void it_can_register_simple_interface()
         {
-            container.RegisterType<ISimple, Simple>();
+            container.RegisterType<IDependency, Dependency>();
             var types = container.GetRegisteredTypes();
-            Assert.Contains(typeof(ISimple), types);
+            Assert.Contains(typeof(IDependency), types);
         }
     }
-
-    public interface ISimple { }
-    public class Simple : ISimple { }
-    public class SampleClass { }
-    public class NotRegistered { }
-    public class UseAsSingleton { }
-
 }
