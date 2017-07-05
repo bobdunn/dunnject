@@ -10,11 +10,14 @@ namespace Dunnject
         private Type abstractType;
         private Type concreteType;
 
-        public TypeContainer(Type abstractType, Type concreteType)
+        public TypeContainer(Type abstractType, Type concreteType, LifecycleType lifecycle = LifecycleType.Transient)
         {
             this.abstractType = abstractType;
             this.concreteType = concreteType;
+            Lifecycle = lifecycle;
         }
+
+        public LifecycleType Lifecycle { get; set; }
 
         public IEnumerable<Type> GetDependencies()
         {

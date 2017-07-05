@@ -16,7 +16,7 @@ namespace Dunnject.Tests
         public void it_should_default_to_transient_lifecycle()
         {
             var typeContainer = new TypeContainer(typeof(SampleClass), typeof(SampleClass));
-            Assert.Equal(LifecycleType.Transient, TypeContainer.LifecycleType);
+            Assert.Equal(LifecycleType.Transient, typeContainer.Lifecycle);
         }
 
     }
