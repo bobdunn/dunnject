@@ -50,6 +50,16 @@ namespace Dunnject.Tests
         }
 
         [Fact]
+        public void it_loads_type_with_registered_dependencies()
+        {
+            container.RegisterType<DependentClass>();
+            container.RegisterType<IDependency, Dependency>();
+            DependentClass dependentClass = container.Resolve<DependentClass>();
+            Assert.NotNull(dependentClass);
+
+        }
+
+        [Fact]
         public void it_returns_different_instance_for_transient_lifecycle()
         {
             var firstInstance = container.Resolve<SampleClass>();
