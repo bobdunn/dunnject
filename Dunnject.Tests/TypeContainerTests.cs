@@ -12,6 +12,13 @@ namespace Dunnject.Tests
             Assert.Contains(typeof(IDependency), typeContainer.GetDependencies());
         }
 
+        [Fact]
+        public void it_should_default_to_transient_lifecycle()
+        {
+            var typeContainer = new TypeContainer(typeof(SampleClass), typeof(SampleClass));
+            Assert.Equal(LifecycleType.Transient, TypeContainer.LifecycleType);
+        }
+
     }
 
     public class DependentClass
