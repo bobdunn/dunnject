@@ -5,7 +5,7 @@ namespace Dunnject
 {
     public class Container
     {
-        Dictionary<Type, object> types = new Dictionary<Type, object>();
+        Dictionary<Type, TypeContainer> types = new Dictionary<Type, TypeContainer>();
 
         public IEnumerable<Type> GetRegisteredTypes()
         {
@@ -19,32 +19,32 @@ namespace Dunnject
 
         public void RegisterType<TAbstract, TConcrete>(LifecycleType lifecycleType = LifecycleType.Transient)
         {
-            switch (lifecycleType)
-            {
-                case LifecycleType.Transient:
-                    types.Add(typeof(TAbstract), typeof(TConcrete));
-                    break;
-                case LifecycleType.Singleton:
-                    types.Add(typeof(TAbstract), Activator.CreateInstance<TConcrete>());
-                    break;
-            }
+            types.Add(typeof(TAbstract), new TypeContainer(typeof(TAbstract), typeof(TConcrete), lifecycleType));
         }
 
         public T Resolve<T>()
         {
-            if (!types.ContainsKey(typeof(T)))
+            TypeContainer type;
+            if (!types.TryGetValue(typeof(T), out type))
             {
                 throw new TypeLoadException();
             }
-            if (types[typeof(T)] != null && !(types[typeof(T)] is Type))
+
+            if (type.Lifecycle == LifecycleType.Singleton)
             {
-                return (T)types[typeof(T)];
+                if (type.Instance == null)
+                {
+                    type.Instance = GetInstance<T>();
+                }
+                return (T)type.Instance;
             }
+
             return GetInstance<T>();
         }
 
-        private T GetInstance<T>(){
-            return (T)Activator.CreateInstance((Type)types[typeof(T)]);
+        private T GetInstance<T>()
+        {
+            return (T)Activator.CreateInstance(types[typeof(T)].ConcreteType);
         }
 
     }

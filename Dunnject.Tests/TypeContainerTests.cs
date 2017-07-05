@@ -18,7 +18,6 @@ namespace Dunnject.Tests
             var typeContainer = new TypeContainer(typeof(SampleClass), typeof(SampleClass));
             Assert.Equal(LifecycleType.Transient, typeContainer.Lifecycle);
         }
-
     }
 
     public class DependentClass
