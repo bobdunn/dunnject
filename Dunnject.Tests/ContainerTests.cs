@@ -43,6 +43,13 @@ namespace Dunnject.Tests
         }
 
         [Fact]
+        public void it_throws_TypeLoadException_trying_to_resolve_class_whose_dependencies_are_not_registered()
+        {
+            container.RegisterType<DependentClass>();
+            Assert.Throws<TypeLoadException>(() => { container.Resolve<DependentClass>(); });
+        }
+
+        [Fact]
         public void it_returns_different_instance_for_transient_lifecycle()
         {
             var firstInstance = container.Resolve<SampleClass>();
@@ -66,5 +73,7 @@ namespace Dunnject.Tests
             var types = container.GetRegisteredTypes();
             Assert.Contains(typeof(IDependency), types);
         }
+
+
     }
 }
