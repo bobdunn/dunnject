@@ -25,32 +25,42 @@ namespace Dunnject
 
         public T Resolve<T>()
         {
-            TypeContainer type;
-            if (!types.TryGetValue(typeof(T), out type))
-            {
-                throw new TypeLoadException();
-            }
-
-            if (type.Lifecycle == LifecycleType.Singleton)
-            {
-                if (type.Instance == null)
-                {
-                    type.Instance = GetInstance<T>();
-                }
-                return (T)type.Instance;
-            }
-
-            return GetInstance<T>();
+            return (T)Resolve(typeof(T));
         }
 
-        private T GetInstance<T>()
+        private object Resolve(Type type)
         {
-            var type = types[typeof(T)];
-            if(type.GetDependencies().Any(t => !types.ContainsKey(t))){
+            TypeContainer typeContainer;
+            if (!types.TryGetValue(type, out typeContainer))
+            {
                 throw new TypeLoadException();
             }
-            return (T)Activator.CreateInstance(types[typeof(T)].ConcreteType);
+
+            if (typeContainer.Lifecycle == LifecycleType.Singleton)
+            {
+                if (typeContainer.Instance == null)
+                {
+                    typeContainer.Instance = GetInstance(type);
+                }
+                return typeContainer.Instance;
+            }
+
+            return GetInstance(type);
         }
 
+        private object GetInstance(Type type)
+        {
+            var typeContainer = types[type];
+            var args = typeContainer.GetDependencies().Select(d =>
+            {
+                if (types.ContainsKey(d))
+                {
+                    return Resolve(d);
+                }
+                else { throw new TypeLoadException(); }
+            }).ToArray();
+
+            return Activator.CreateInstance(typeContainer.ConcreteType, args);
+        }
     }
 }
