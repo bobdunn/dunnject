@@ -9,4 +9,12 @@
     }
     public interface IDependency { }
     public class Dependency : IDependency { }
+    public class CircularA
+    {
+        public CircularA(CircularB circularB) { }
+    }
+    public class CircularB
+    {
+        public CircularB(CircularA circularA) { }
+    }
 }

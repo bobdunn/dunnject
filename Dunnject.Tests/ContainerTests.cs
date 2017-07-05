@@ -50,6 +50,14 @@ namespace Dunnject.Tests
         }
 
         [Fact]
+        public void it_throws_TypeLoadException_trying_to_resolve_class_with_circular_dependencies()
+        {
+            container.RegisterType<CircularA>();
+            container.RegisterType<CircularB>();
+            Assert.Throws<TypeLoadException>(() => { container.Resolve<CircularA>(); });
+        }
+
+        [Fact]
         public void it_loads_type_with_registered_dependencies()
         {
             container.RegisterType<DependentClass>();
