@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Dunnject
 {
@@ -44,6 +45,10 @@ namespace Dunnject
 
         private T GetInstance<T>()
         {
+            var type = types[typeof(T)];
+            if(type.GetDependencies().Any(t => !types.ContainsKey(t))){
+                throw new TypeLoadException();
+            }
             return (T)Activator.CreateInstance(types[typeof(T)].ConcreteType);
         }
 
