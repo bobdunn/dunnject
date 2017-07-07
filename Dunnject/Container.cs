@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Dunnject
 {
     public class Container
     {
-        Dictionary<Type, TypeContainer> types = new Dictionary<Type, TypeContainer>();
+        Dictionary<string, List<TypeContainer>> types = new Dictionary<string, List<TypeContainer>>();
 
-        public IEnumerable<Type> GetRegisteredTypes()
+        public IEnumerable<string> GetRegisteredTypes()
         {
             return types.Keys;
         }
@@ -20,7 +21,55 @@ namespace Dunnject
 
         public void RegisterType<TAbstract, TConcrete>(LifecycleType lifecycleType = LifecycleType.Transient)
         {
-            types.Add(typeof(TAbstract), new TypeContainer(typeof(TAbstract), typeof(TConcrete), lifecycleType));
+            RegisterType(typeof(TAbstract), typeof(TConcrete), lifecycleType);
+        }
+
+        public void RegisterType(Type abstractType, Type concreteType, LifecycleType lifecycleType = LifecycleType.Transient)
+        {
+            string name = GetName(abstractType);
+            if (!types.ContainsKey(name))
+            {
+                types[name] = new List<TypeContainer>();
+            }
+            types[name].Add(new TypeContainer(abstractType, concreteType, lifecycleType));
+        }
+
+        public IEnumerable<object> ResolveMultiple(Type type)
+        {
+            string name = GetName(type);
+            List<TypeContainer> typeContainers;
+            if (!types.TryGetValue(name, out typeContainers))
+            {
+                throw new TypeLoadException();
+            }
+            foreach (TypeContainer typeContainer in typeContainers)
+            {
+                if (typeContainer.Lifecycle == LifecycleType.Singleton)
+                {
+                    if (typeContainer.Instance == null)
+                    {
+                        typeContainer.Instance = GetInstance(typeContainer.AbstractType);
+                    }
+                    yield return typeContainer.Instance;
+                }
+
+                yield return GetInstance(typeContainer.AbstractType);
+            }
+        }
+
+        string GetName(Type type)
+        {
+            return $"{type.Namespace}.{type.Name}";
+        }
+
+        public void RegisterType(Type abstractType, object instance)
+        {
+            string name = GetName(abstractType);
+            if (!types.ContainsKey(name))
+            {
+                types[name] = new List<TypeContainer>();
+            }
+            types[name].Add(new TypeContainer(abstractType, instance));
         }
 
         public T Resolve<T>()
@@ -28,43 +77,58 @@ namespace Dunnject
             return (T)Resolve(typeof(T));
         }
 
-        private object Resolve(Type type)
+        public object Resolve(Type type)
         {
-            TypeContainer typeContainer;
-            if (!types.TryGetValue(type, out typeContainer))
+            string name = GetName(type);
+            List<TypeContainer> typeContainers;
+            if (!types.TryGetValue(name, out typeContainers))
             {
                 throw new TypeLoadException();
             }
-
+            var typeContainer = typeContainers[0];
             if (typeContainer.Lifecycle == LifecycleType.Singleton)
             {
                 if (typeContainer.Instance == null)
                 {
-                    typeContainer.Instance = GetInstance(type);
+                    typeContainer.Instance = GetInstance(typeContainer.AbstractType);
                 }
                 return typeContainer.Instance;
             }
 
-            return GetInstance(type);
+            return GetInstance(typeContainer.AbstractType);
         }
 
-        private HashSet<Type> resolvingTypes = new HashSet<Type>();
+        private HashSet<string> resolvingTypes = new HashSet<string>();
         private object GetInstance(Type type)
         {
-            var typeContainer = types[type];
-            var args = typeContainer.GetDependencies().Select(d =>
+            var containers = types[GetName(type)];
+            var singleton = containers.FirstOrDefault(c => c.Instance != null);
+            if (singleton != null)
             {
-                if (types.ContainsKey(d) && !resolvingTypes.Contains(d))
+                return singleton.Instance;
+            }
+            foreach (var container in containers.Where(c=>c.Instance==null))
+            {
+                try
                 {
-                    resolvingTypes.Add(d);
-                    var dependentType = Resolve(d);
-                    resolvingTypes.Remove(d);
-                    return dependentType;
-                }
-                else { throw new TypeLoadException(); }
-            }).ToArray();
+                    var args = container.GetDependencies().Select(d =>
+                    {
+                        string name = GetName(d);
 
-            return Activator.CreateInstance(typeContainer.ConcreteType, args);
+                        if (types.ContainsKey(name) && !resolvingTypes.Contains(name))
+                        {
+                            resolvingTypes.Add(name);
+                            var dependentType = Resolve(d);
+                            resolvingTypes.Remove(name);
+                            return dependentType;
+                        }
+                        else { throw new TypeLoadException($"Failed to load {container.ConcreteType}"); }
+                    }).ToArray();
+
+                    return Activator.CreateInstance(container.ConcreteType, args);
+                } catch { }
+            }
+            throw new TypeLoadException();
         }
     }
 }

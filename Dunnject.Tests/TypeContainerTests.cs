@@ -20,5 +20,16 @@ namespace Dunnject.Tests
         }
     }
 
+    public class When_using_a_singleton_TypeContainer
+    {
+        [Fact]
+        public void it_should_allow_you_to_provide_the_instance()
+        {
+            var sampleClass = new SampleClass();
+            var typeContainer = new TypeContainer(typeof(SampleClass), sampleClass);
+            Assert.Same(sampleClass, typeContainer.Instance);
+        }
+    }
+
 
 }

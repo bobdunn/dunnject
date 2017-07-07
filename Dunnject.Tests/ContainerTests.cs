@@ -12,7 +12,6 @@ namespace Dunnject.Tests
         public When_container_is_initialized()
         {
             container = new Container();
-            container.RegisterType<SampleClass>();
         }
 
         [Fact]
@@ -25,13 +24,15 @@ namespace Dunnject.Tests
         [Fact]
         public void it_can_register_a_simple_type()
         {
+            container.RegisterType<SampleClass>();
             var types = container.GetRegisteredTypes();
-            Assert.Equal(typeof(SampleClass), types.First());
+            Assert.Equal("Dunnject.Tests.SampleClass", types.First());
         }
 
         [Fact]
         public void it_can_get_a_simple_type()
         {
+            container.RegisterType<SampleClass>();
             var sampleClass = container.Resolve<SampleClass>();
             Assert.IsType<SampleClass>(sampleClass);
         }
@@ -70,6 +71,7 @@ namespace Dunnject.Tests
         [Fact]
         public void it_returns_different_instance_for_transient_lifecycle()
         {
+            container.RegisterType<SampleClass>();
             var firstInstance = container.Resolve<SampleClass>();
             var secondInstance = container.Resolve<SampleClass>();
             Assert.NotSame(firstInstance, secondInstance);
@@ -85,11 +87,19 @@ namespace Dunnject.Tests
         }
 
         [Fact]
+        public void it_returns_given_instance_if_instance_passed_in()
+        {
+            var sampleClass = new SampleClass();
+            container.RegisterType(typeof(SampleClass), sampleClass);
+            Assert.Same(sampleClass, container.Resolve<SampleClass>());
+        }
+
+        [Fact]
         public void it_can_register_simple_interface()
         {
             container.RegisterType<IDependency, Dependency>();
             var types = container.GetRegisteredTypes();
-            Assert.Contains(typeof(IDependency), types);
+            Assert.Contains("Dunnject.Tests.IDependency", types);
         }
 
 
